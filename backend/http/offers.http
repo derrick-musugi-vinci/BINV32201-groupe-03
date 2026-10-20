@@ -30,6 +30,10 @@ Content-Type: application/json
 GET http://localhost:3000/offers
 Authorization: {{admin.response.body.token}}
 
+### Offres P2 vues par l'administrateur
+GET http://localhost:3000/offers?period=P2
+Authorization: {{admin.response.body.token}}
+
 ### Offres vues par l'étudiant
 GET http://localhost:3000/offers
 Authorization: {{student.response.body.token}}

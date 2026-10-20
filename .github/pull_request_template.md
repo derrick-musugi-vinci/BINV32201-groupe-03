@@ -1,4 +1,4 @@
-## Fonctionnalité
+²## Fonctionnalité
 
 <!-- Quelle fonctionnalité du cahier des charges ? Indiquez l'exigence (EF-xx, RG-xx) ou l'issue (#…). -->
 

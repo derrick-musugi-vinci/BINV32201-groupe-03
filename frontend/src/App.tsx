@@ -4,6 +4,7 @@ import Layout from "./components/Layout.tsx";
 import LoadingState from "./components/LoadingState.tsx";
 import { useAuth } from "./hooks/useAuth.ts";
 import CompaniesPage from "./pages/CompaniesPage.tsx";
+import ApplicationsPage from "./pages/ApplicationsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
@@ -27,6 +28,12 @@ const App = () => {
             element={
               <OffersPage user={auth.user} token={auth.token} onUnauthorized={auth.logout} />
             }
+          />
+        )}
+        {auth.user.kind === "STUDENT" && (
+          <Route
+            path="/candidatures"
+            element={<ApplicationsPage token={auth.token} onUnauthorized={auth.logout} />}
           />
         )}
         <Route

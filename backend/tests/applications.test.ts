@@ -9,7 +9,7 @@ beforeEach(() => {
   app = createTestApp();
 });
 
-const studentToken = (id = STUDENT.LUCAS_DUPONT) => tokenFor("STUDENT", id);
+const studentToken = (id: number = STUDENT.LUCAS_DUPONT) => tokenFor("STUDENT", id);
 
 describe("applications étudiant", () => {
   it("liste uniquement les candidatures de l'étudiant connecté", async () => {
@@ -36,6 +36,24 @@ describe("applications étudiant", () => {
       message: "Mon message",
       status: "IN_PROGRESS",
     });
+  });
+
+  it("accepte un message vide et refuse un message trop long", async () => {
+    const emptyMessage = await request(app)
+      .post("/applications")
+      .set("Authorization", studentToken())
+      .send({ offerId: OFFER.BILLING_API, message: "   " });
+
+    expect(emptyMessage.status).toBe(201);
+    expect(emptyMessage.body.message).toBeNull();
+
+    const longMessage = await request(app)
+      .post("/applications")
+      .set("Authorization", studentToken(STUDENT.INES_HADDAD))
+      .send({ offerId: OFFER.BILLING_API, message: "a".repeat(2001) });
+
+    expect(longMessage.status).toBe(400);
+    expect(longMessage.body.error.code).toBe("INVALID_BODY");
   });
 
   it("refuse une offre non publiée et les doublons actifs", async () => {
@@ -65,6 +83,15 @@ describe("applications étudiant", () => {
       .set("Authorization", studentToken());
     expect(withdrawn.status).toBe(204);
 
+    const listed = await request(app)
+      .get("/applications")
+      .set("Authorization", studentToken());
+    expect(listed.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: created.body.id, status: "WITHDRAWN" }),
+      ]),
+    );
+
     const replacement = await request(app)
       .post("/applications")
       .set("Authorization", studentToken())
@@ -87,5 +114,21 @@ describe("applications étudiant", () => {
       .set("Authorization", tokenFor("ADMIN", 1));
 
     expect(response.status).toBe(403);
+  });
+
+  it("refuse la création et le retrait par un administrateur", async () => {
+    const adminToken = tokenFor("ADMIN", 1);
+    const createResponse = await request(app)
+      .post("/applications")
+      .set("Authorization", adminToken)
+      .send({ offerId: OFFER.BILLING_API });
+    expect(createResponse.status).toBe(403);
+    expect(createResponse.body.error.code).toBe("FORBIDDEN");
+
+    const withdrawResponse = await request(app)
+      .delete(`/applications/${APPLICATION.LUCAS_FLEET_APP}`)
+      .set("Authorization", adminToken);
+    expect(withdrawResponse.status).toBe(403);
+    expect(withdrawResponse.body.error.code).toBe("FORBIDDEN");
   });
 });

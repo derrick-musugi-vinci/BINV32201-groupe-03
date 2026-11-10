@@ -26,6 +26,28 @@ const applications = [
     status: "REJECTED",
     appliedAt: "2026-09-23 17:25:00",
   },
+  {
+    id: 3,
+    offerId: 6,
+    offerTitle: "Migration cloud",
+    companyShortName: "Datavia",
+    academicYear: "2026-2027",
+    period: "P1",
+    message: null,
+    status: "SELECTED",
+    appliedAt: "2026-09-20 10:00:00",
+  },
+  {
+    id: 4,
+    offerId: 7,
+    offerTitle: "Chatbot interne",
+    companyShortName: "Cobalt",
+    academicYear: "2026-2027",
+    period: "P2",
+    message: null,
+    status: "WITHDRAWN",
+    appliedAt: "2026-09-18 09:00:00",
+  },
 ] as const;
 
 describe("ApplicationsPage", () => {
@@ -39,6 +61,8 @@ describe("ApplicationsPage", () => {
     expect(await screen.findByText("Refonte du portail client")).toBeInTheDocument();
     expect(screen.getByText("En cours")).toBeInTheDocument();
     expect(screen.getByText("Non retenue")).toBeInTheDocument();
+    expect(screen.getByText("Retenue")).toBeInTheDocument();
+    expect(screen.getByText("Retirée")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Retirer" }));
 

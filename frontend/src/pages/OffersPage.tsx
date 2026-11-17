@@ -3,6 +3,7 @@ import EmptyState from "../components/EmptyState.tsx";
 import ErrorState from "../components/ErrorState.tsx";
 import LoadingState from "../components/LoadingState.tsx";
 import OfferTable from "../components/OfferTable.tsx";
+import SearchField from "../components/SearchField.tsx";
 import { useOffers } from "../hooks/useOffers.ts";
 import { useApplications } from "../hooks/useApplications.ts";
 import type { PeriodCode } from "../models/offer.ts";
@@ -22,7 +23,13 @@ const DESCRIPTIONS = {
 
 const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
   const [period, setPeriod] = useState<PeriodCode | "">("");
-  const { offers, isLoading, error } = useOffers(token, period || undefined, onUnauthorized);
+  const [search, setSearch] = useState("");
+  const { offers, isLoading, error } = useOffers(
+    token,
+    period || undefined,
+    search.trim() || undefined,
+    onUnauthorized,
+  );
   const {
     applications,
     isLoading: applicationsLoading,
@@ -48,7 +55,17 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
     if (error) return <ErrorState message={error} />;
     if (applicationsError && user.kind === "STUDENT") return <ErrorState message={applicationsError} />;
     if (isLoading || (user.kind === "STUDENT" && applicationsLoading)) return <LoadingState />;
-    if (offers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
+    if (offers.length === 0) {
+      return (
+        <EmptyState
+          message={
+            search.trim()
+              ? "Aucune offre ne correspond à votre recherche."
+              : "Aucune offre à afficher."
+          }
+        />
+      );
+    }
     return (
       <>
         <p className="result-count">
@@ -71,6 +88,7 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
     <section>
       <h1>Offres de stage</h1>
       <p>{DESCRIPTIONS[user.kind]}</p>
+      <SearchField label="Rechercher dans les titres" value={search} onChange={setSearch} />
       <label>
         <span>Période</span>
         <select

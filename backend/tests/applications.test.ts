@@ -108,6 +108,15 @@ describe("applications étudiant", () => {
     expect(response.body.error.code).toBe("APPLICATION_PROCESSED");
   });
 
+  it("refuse le retrait d'une candidature appartenant à un autre étudiant", async () => {
+    const response = await request(app)
+      .delete(`/applications/${APPLICATION.INES_FLEET_APP}`)
+      .set("Authorization", studentToken());
+
+    expect(response.status).toBe(404);
+    expect(response.body.error.code).toBe("NOT_FOUND");
+  });
+
   it("réserve les candidatures aux étudiants", async () => {
     const response = await request(app)
       .get("/applications")

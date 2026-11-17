@@ -114,4 +114,50 @@ describe("GET /offers : visibilité selon le profil", () => {
     expect(response.status).toBe(400);
     expect(response.body.error.code).toBe("INVALID_QUERY");
   });
+
+  it("recherche une expression dans le titre sans tenir compte de la casse", async () => {
+    const response = await request(app)
+      .get("/offers")
+      .query({ q: "  API REST  " })
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.BILLING_API]);
+  });
+
+  it("combine la recherche avec la période et conserve la visibilité étudiante", async () => {
+    const response = await request(app)
+      .get("/offers")
+      .query({ q: "application", period: "P2" })
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.FLEET_APP]);
+    expect(response.body.every((offer: { status: string }) => offer.status === "PUBLISHED")).toBe(
+      true,
+    );
+  });
+
+  it("retourne une liste vide sans correspondance et ignore une recherche vide", async () => {
+    const noMatch = await request(app)
+      .get("/offers")
+      .query({ q: "titre inexistant" })
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+    const empty = await request(app)
+      .get("/offers")
+      .query({ q: "   " })
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(noMatch.body).toEqual([]);
+    expect(empty.body).toHaveLength(10);
+  });
+
+  it("refuse un paramètre q répété", async () => {
+    const response = await request(app)
+      .get("/offers?q=api&q=cloud")
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("INVALID_QUERY");
+  });
 });

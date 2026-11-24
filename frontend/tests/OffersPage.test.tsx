@@ -52,6 +52,26 @@ describe("OffersPage", () => {
     expect(screen.getByText("Les offres que vous avez déposées.")).toBeInTheDocument();
   });
 
+  it("filtre les offres par titre sans tenir compte de la casse", async () => {
+    stubFetch({ "/api/offers": () => Response.json(offers) });
+
+    render(<OffersPage user={contactUser} token="jeton" onUnauthorized={vi.fn()} />);
+    expect(await screen.findByText("2 offres")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Rechercher par titre" }), {
+      target: { value: "PORTAIL" },
+    });
+
+    expect(screen.getByText("Refonte du portail client")).toBeInTheDocument();
+    expect(screen.queryByText("Tableau de bord de qualité des données")).not.toBeInTheDocument();
+    expect(screen.getByText("1 offre")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Rechercher par titre" }), {
+      target: { value: "titre absent" },
+    });
+    expect(screen.getByText("Aucune offre à afficher.")).toBeInTheDocument();
+  });
+
   it("adapte la description au profil", async () => {
     stubFetch({
       "/api/offers": () => Response.json([]),

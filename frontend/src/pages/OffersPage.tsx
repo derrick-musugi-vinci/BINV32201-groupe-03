@@ -3,6 +3,7 @@ import EmptyState from "../components/EmptyState.tsx";
 import ErrorState from "../components/ErrorState.tsx";
 import LoadingState from "../components/LoadingState.tsx";
 import OfferTable from "../components/OfferTable.tsx";
+import SearchField from "../components/SearchField.tsx";
 import { useOffers } from "../hooks/useOffers.ts";
 import { useApplications } from "../hooks/useApplications.ts";
 import type { PeriodCode } from "../models/offer.ts";
@@ -22,7 +23,10 @@ const DESCRIPTIONS = {
 
 const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
   const [period, setPeriod] = useState<PeriodCode | "">("");
+  const [search, setSearch] = useState("");
   const { offers, isLoading, error } = useOffers(token, period || undefined, onUnauthorized);
+  const query = search.trim().toLocaleLowerCase();
+  const filteredOffers = offers.filter((offer) => offer.title.toLocaleLowerCase().includes(query));
   const {
     applications,
     isLoading: applicationsLoading,
@@ -48,15 +52,15 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
     if (error) return <ErrorState message={error} />;
     if (applicationsError && user.kind === "STUDENT") return <ErrorState message={applicationsError} />;
     if (isLoading || (user.kind === "STUDENT" && applicationsLoading)) return <LoadingState />;
-    if (offers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
+    if (filteredOffers.length === 0) return <EmptyState message="Aucune offre à afficher." />;
     return (
       <>
         <p className="result-count">
-          {offers.length} offre{offers.length > 1 ? "s" : ""}
+          {filteredOffers.length} offre{filteredOffers.length > 1 ? "s" : ""}
         </p>
         {applicationError && <ErrorState message={applicationError} />}
         <OfferTable
-          offers={offers}
+          offers={filteredOffers}
           onApply={user.kind === "STUDENT" ? apply : undefined}
           applyingOfferId={applyingOfferId}
           applicationStatuses={Object.fromEntries(
@@ -84,6 +88,7 @@ const OffersPage = ({ user, token, onUnauthorized }: OffersPageProps) => {
           <option value="OTHER">Autre période</option>
         </select>
       </label>
+      <SearchField label="Rechercher par titre" value={search} onChange={setSearch} />
       {renderContent()}
     </section>
   );

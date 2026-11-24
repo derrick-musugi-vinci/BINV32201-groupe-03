@@ -1,7 +1,8 @@
 # Bilan global
 
-- Nous avons aimé ce projet, car nous avons appris à mieux utiliser l’IA : donner du contexte, formuler des demandes précises, vérifier les réponses et les améliorer au lieu de les accepter sans recul.
-- Nous avons découvert le fonctionnement d’une application complète en reliant l’interface React et TypeScript, l’API Express, les services métier, les dépôts et la base SQLite.
-- Nous avons mieux compris l’importance de la séparation des responsabilités, de la validation des données et des contrôles d’accès côté serveur pour protéger les fonctionnalités selon le profil.
-- Nous avons appris à vérifier les changements avec des tests ciblés, des données maîtrisées et des assertions explicites, puis avec les commandes de lint, de typage, de tests et de build.
-- Nous aurions aimé approfondir l’exécution des tests E2E dans un navigateur réel et leur intégration continue, ainsi que l’orchestration d’agents IA sur des tâches plus longues et complexes.
+- Nous avons beaucoup apprécié ce projet, qui nous a permis de découvrir les possibilités de l’IA et d’apprendre à l’utiliser de manière plus efficace.
+- Nous avons notamment compris l’importance de fournir un contexte suffisant, de formuler des prompts précis et de vérifier, analyser et corriger les résultats générés.
+- La partie du cours expliquant comment économiser des tokens était très intéressant
+- Nous regrettons toutefois de ne pas avoir pu approfondir les tests end-to-end (E2E) avec le MCP, en raison de difficultés de configuration.;
+
+Nous pensons que nous avons gagner des compétences utilisable dans nos projets futures suite à ce cours.
